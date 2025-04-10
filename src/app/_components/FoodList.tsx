@@ -16,7 +16,6 @@ type CategoryType = {
 };
 
 const FoodList = async () => {
-  console.log(process.env.BASE_URL);
   const response = await fetch(`${BASE_URL}/categories/with-foods`, {
     headers: {
       "Content-Type": "application/json",

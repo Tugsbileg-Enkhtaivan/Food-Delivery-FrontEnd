@@ -1,46 +1,105 @@
 "use client";
 
-import React from "react";
-import { Button } from "../../../components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { Input } from "../../../components/ui/input";
-import { CldImage } from "next-cloudinary";
+import { Button } from "@/components/ui/button";
+import { jwtDecode } from "jwt-decode";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { BASE_URL } from "@/constants";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+const Login = () => {
+  const router = useRouter();
+  const [error, setError] = useState("");
 
-const LoginPage = () => {
+  const formSchema = z.object({
+    email: z.string().min(2).max(50),
+    password: z.string().min(8),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (val) => {
+    try {
+      const user = await axios.post(`${BASE_URL}/auth/login`, val);
+
+      if (user) {
+        toast("User successfully register.");
+      }
+
+      localStorage.setItem("token", user.data.token);
+
+      const decodedToken = jwtDecode(user.data.token);
+
+      if (decodedToken.user.role == "ADMIN") {
+        router.push("/admin");
+        return;
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      setError(error.response.data.error);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-3 w-full h-screen">
-      <div className="w-[416px] h-[288px] space-y-6 col-span-1">
-        <Button variant="outline">
-          <ChevronLeft />
-        </Button>
-        <div>
-          <h1 className="text-[24px] font-semibold">Create your account</h1>
-          <h2 className="text-[16px] font-normal text-[#71717A]">
-            Sign up to explore your favorite dishes.
-          </h2>
-        </div>
-        <Input placeholder="Enter your email address" className="" />
-        <Button className="w-full">Lets Go</Button>
-        <div className="flex justify-center">
-          <Button variant="link" className="text-[#71717A] text-[16px]">
-            Already have an account?
-          </Button>
-          <Button variant="link" className="text-[#2563EB] text-[16px]">
-            Log in
-          </Button>
-        </div>
-      </div>
-      <div className="col-span-2">
-        <CldImage
-          width="960"
-          height="600"
-          src="https://res.cloudinary.com/duuodnpdn/image/upload/v1744163343/kai-pilger-tL92LY152Sk-unsplash_1_m2nbf8.png"
-          sizes="100vw"
-          alt="Description of my image"
-        />
-      </div>
+    <div className="w-1/4">
+      <h1>Нэвтрэх</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="my-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Enter your email..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="my-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Password" type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {error && <p className="text-red-500">{error}</p>}
+
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
     </div>
   );
 };
 
-export default LoginPage;
+export default Login;
