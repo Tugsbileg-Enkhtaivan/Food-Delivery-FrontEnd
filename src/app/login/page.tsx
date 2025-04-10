@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { CldImage } from "next-cloudinary";
 
-const Login = () => {
+const LoginPage = () => {
   return (
     <div className="grid grid-cols-3 w-full h-screen">
       <div className="w-[416px] h-[288px] space-y-6 col-span-1">
@@ -41,4 +41,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;
