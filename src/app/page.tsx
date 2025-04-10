@@ -1,6 +1,6 @@
 "use client";
 // import FoodList from "./_components/FoodList";
-import LoginPage from "./login/page";
+import LoginPage from "./(auth)/login/page";
 
 export default function Home() {
   return (
