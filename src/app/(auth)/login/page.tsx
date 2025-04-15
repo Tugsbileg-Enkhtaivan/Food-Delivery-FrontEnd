@@ -35,9 +35,9 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (val) => {
+  const onSubmit = async (value) => {
     try {
-      const user = await axios.post(`${BASE_URL}/auth/login`, val);
+      const user = await axios.post(`${BASE_URL}/auth/login`, value);
 
       if (user) {
         toast("User successfully register.");
