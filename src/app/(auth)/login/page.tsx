@@ -35,8 +35,27 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (val: LoginType) => {
-    login(val);
+  const onSubmit = async (val) => {
+    try {
+      const user = await axios.post(`${BASE_URL}/auth/login`, val);
+
+      if (user) {
+        toast("User successfully register.");
+      }
+
+      localStorage.setItem("token", user.data.token);
+
+      const decodedToken = jwtDecode(user.data.token);
+
+      if (decodedToken.user.role == "ADMIN") {
+        router.push("/admin");
+        return;
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      setError(error.response.data.error);
+    }
   };
 
   return (
